@@ -6,11 +6,18 @@ import { useForm } from "react-hook-form";
 import { userSchema } from "../schemas/userSchema";
 
 function CreateUser({
+   mode,
   editingUser,
   setEditingUser,
 }) {
-  const createUserMutation = useCreateUser();
-  const updateUserMutation = useUpdateUser();
+
+  console.log(mode, "current mode");
+  
+ const createUserMutation =
+    useCreateUser(mode);
+
+  const updateUserMutation =
+    useUpdateUser(mode);
 
   const {
   register,
@@ -40,26 +47,47 @@ useEffect(() => {
       email: editingUser.email,
       age: editingUser.age,
     });
+  } else {
+    reset({
+      name: "",
+      email: "",
+      age: 18,
+    });
   }
 }, [editingUser, reset]);
 
 const onSubmit = (data) => {
   if (editingUser) {
-    updateUserMutation.mutate({
-      id: editingUser._id,
-      userData: data,
-    });
+    updateUserMutation.mutate(
+      {
+        id: editingUser._id,
+        userData: data,
+      },
+      {
+        onSuccess: () => {
+          setEditingUser(null);
 
-    setEditingUser(null);
-
-    reset();
+          reset({
+            name: "",
+            email: "",
+            age: 18,
+          });
+        },
+      }
+    );
 
     return;
   }
 
-  createUserMutation.mutate(data);
-
-  reset();
+  createUserMutation.mutate(data, {
+    onSuccess: () => {
+      reset({
+        name: "",
+        email: "",
+        age: 18,
+      });
+    },
+  });
 };
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg">

@@ -1,14 +1,14 @@
 import { useDeleteUser } from "../hooks/useDeleteUser";
 import { useUsers } from "../hooks/useUsers";
 
-function Users({ setEditingUser }) {
+function Users({mode, setEditingUser }) {
   const {
     data = [],
     isLoading,
     isFetching,
   } = useUsers();
 
-  const deleteUserMutation = useDeleteUser();
+  const deleteUserMutation = useDeleteUser(mode);
 
   if (isLoading) {
     return (

@@ -25,14 +25,14 @@ function Header() {
             to="/normal"
             className={navClass}
           >
-            Normal CRUD
+            Normal Mode
           </NavLink>
 
           <NavLink
             to="/advanced"
             className={navClass}
           >
-            Advanced CRUD
+            Advanced Mode
           </NavLink>
         </nav>
       </div>
