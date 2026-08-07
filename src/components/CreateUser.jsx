@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { useUpdateUser } from "../hooks/useUpdateUser";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { userSchema } from "../schemas/userSchema";
 
 function CreateUser({
   editingUser,
@@ -9,51 +12,55 @@ function CreateUser({
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
 
+  const {
+  register,
+  handleSubmit,
+  reset,
+  formState: { errors },
+} = useForm({
+  resolver: zodResolver(userSchema),
+
+  defaultValues: {
+    name: "",
+    email: "",
+    age: 18,
+  },
+});
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     age: "",
   });
 
-  useEffect(() => {
-    if (editingUser) {
-      setFormData({
-        name: editingUser.name,
-        email: editingUser.email,
-        age: editingUser.age,
-      });
-    }
-  }, [editingUser]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (editingUser) {
-      updateUserMutation.mutate({
-        id: editingUser._id,
-        userData: formData,
-      });
-
-      setEditingUser(null);
-
-      setFormData({
-        name: "",
-        email: "",
-        age: "",
-      });
-
-      return;
-    }
-
-    createUserMutation.mutate(formData);
-
-    setFormData({
-      name: "",
-      email: "",
-      age: "",
+useEffect(() => {
+  if (editingUser) {
+    reset({
+      name: editingUser.name,
+      email: editingUser.email,
+      age: editingUser.age,
     });
-  };
+  }
+}, [editingUser, reset]);
 
+const onSubmit = (data) => {
+  if (editingUser) {
+    updateUserMutation.mutate({
+      id: editingUser._id,
+      userData: data,
+    });
+
+    setEditingUser(null);
+
+    reset();
+
+    return;
+  }
+
+  createUserMutation.mutate(data);
+
+  reset();
+};
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
       <h2 className="mb-5 text-2xl font-bold">
@@ -63,59 +70,61 @@ function CreateUser({
       </h2>
 
       <form
-        onSubmit={handleSubmit}
+         onSubmit={handleSubmit(onSubmit)}
         className="grid gap-4 md:grid-cols-4"
       >
-        <input
-          className="rounded-lg border border-slate-700 bg-slate-800 p-3 text-white outline-none focus:border-blue-500"
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              name: e.target.value,
-            })
-          }
-        />
+        <div>
+  <input
+    {...register("name")}
+    placeholder="Name"
+    className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+  />
 
-        <input
-          className="rounded-lg border border-slate-700 bg-slate-800 p-3 text-white outline-none focus:border-blue-500"
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              email: e.target.value,
-            })
-          }
-        />
+  {errors.name && (
+    <p className="mt-1 text-sm text-red-400">
+      {errors.name.message}
+    </p>
+  )}
+</div>
 
-        <input
-          className="rounded-lg border border-slate-700 bg-slate-800 p-3 text-white outline-none focus:border-blue-500"
-          type="number"
-          placeholder="Age"
-          value={formData.age}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              age: Number(e.target.value),
-            })
-          }
-        />
+<div>
+  <input
+    {...register("email")}
+    placeholder="Email"
+    className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+  />
 
-        <button
-          className="rounded-lg bg-blue-600 px-4 py-3 font-medium hover:bg-blue-700"
-          type="submit"
-        >
-          {createUserMutation.isPending ||
-          updateUserMutation.isPending
-            ? "Saving..."
-            : editingUser
-            ? "Update User"
-            : "Create User"}
-        </button>
+  {errors.email && (
+    <p className="mt-1 text-sm text-red-400">
+      {errors.email.message}
+    </p>
+  )}
+</div>
+
+<div>
+  <input
+    type="number"
+    placeholder="Age"
+    {...register("age", {
+      valueAsNumber: true,
+    })}
+    className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+  />
+
+  {errors.age && (
+    <p className="mt-1 text-sm text-red-400">
+      {errors.age.message}
+    </p>
+  )}
+</div>
+       <button
+  type="submit"
+  className="rounded-lg bg-blue-600 px-4 py-3"
+>
+  {editingUser
+    ? "Update User"
+    : "Create User"}
+</button>
       </form>
     </div>
   );
