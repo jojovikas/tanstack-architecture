@@ -1,27 +1,34 @@
-import { useState } from "react";
-import CreateUser from "./components/CreateUser";
-import Users from "./pages/Users";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Header from "./components/Header";
+
+import Home from "./pages/Home";
+import NormalCrud from "./pages/NormalCrud";
+import AdvancedCrud from "./pages/AdvancedCrud";
 
 function App() {
-  const [editingUser, setEditingUser] = useState(null);
-
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
-      <div className="mx-auto max-w-7xl">
-        {/* <h1 className="mb-8 text-center text-4xl font-bold">
-          React Query CRUD
-        </h1> */}
+    <BrowserRouter>
+      <div className="min-h-screen bg-slate-950 text-white">
+        <Header />
 
-        <CreateUser
-          editingUser={editingUser}
-          setEditingUser={setEditingUser}
-        />
+        <div className="mx-auto max-w-7xl p-6">
+          <Routes>
+            <Route path="/" element={<Home />} />
 
-        <div className="mt-8">
-          <Users setEditingUser={setEditingUser} />
+            <Route
+              path="/normal"
+              element={<NormalCrud />}
+            />
+
+            <Route
+              path="/advanced"
+              element={<AdvancedCrud />}
+            />
+          </Routes>
         </div>
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
 
