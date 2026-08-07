@@ -9,17 +9,22 @@ export const useCreateUser = (mode) => {
   return useMutation({
     mutationFn: createUser,
 
-    
-
     onSuccess: (data) => {
       toast.success(
         `${data.name} created successfully 🎉`
       );
 
-      // queryClient.invalidateQueries({
-      //   queryKey: ["users"],
-      // });
-             if (mode === "advanced") {
+      // Normal CRUD
+      if (mode === "normal") {
+        queryClient.invalidateQueries({
+          queryKey: ["users"],
+        });
+
+        return;
+      }
+
+      // Advanced CRUD
+      if (mode === "advanced") {
         queryClient.setQueryData(
           ["users"],
           (oldUsers = []) => [
@@ -27,18 +32,29 @@ export const useCreateUser = (mode) => {
             ...oldUsers,
           ]
         );
-      } else {
-        queryClient.invalidateQueries({
-          queryKey: ["users"],
-        });
+
+        return;
+      }
+
+      // Optimistic CRUD
+      // (abhi temporary Advanced jaisa hi rakhenge)
+      if (mode === "optimistic") {
+        queryClient.setQueryData(
+          ["users"],
+          (oldUsers = []) => [
+            data,
+            ...oldUsers,
+          ]
+        );
       }
     },
 
     onError: (error) => {
       console.log(error, "error");
-      
+
       toast.error(
-        error.message || "Failed to create user"
+        error.message ||
+          "Failed to create user"
       );
     },
   });

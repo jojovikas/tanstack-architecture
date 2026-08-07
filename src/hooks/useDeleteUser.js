@@ -7,26 +7,29 @@ export const useDeleteUser = (mode) => {
   return useMutation({
     mutationFn: deleteUser,
 
-   onSuccess: (_, deletedUserId) => {
-      if (mode === "advanced") {
-        queryClient.setQueryData(
-          ["users"],
-          (oldUsers = []) =>
-            oldUsers.filter(
-              (user) =>
-                user._id !== deletedUserId
-            )
-        );
-      } else {
+    onMutate: async (deletedUserId) => {
+      if (mode !== "optimistic") return;
+      const previousUsers = queryClient.getQueryData(["users"]);
+      queryClient.setQueryData(["users"], (oldUsers = []) =>
+        oldUsers.filter((user) => user._id !== deletedUserId),
+      );
+    },
+
+    onSuccess: (_, deletedUserId) => {
+      if (mode === "normal") {
         queryClient.invalidateQueries({
           queryKey: ["users"],
         });
       }
+      if (mode === "advanced") {
+        queryClient.setQueryData(["users"], (oldUsers = []) =>
+          oldUsers.filter((user) => user._id !== deletedUserId),
+        );
+      }
     },
+    onError: (error, deletedUserId, context) => {},
   });
 };
-
-
 
 // import {
 //   useMutation,

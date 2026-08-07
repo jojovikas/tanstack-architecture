@@ -34,6 +34,13 @@ function Header() {
           >
             Advanced Mode
           </NavLink>
+
+            <NavLink
+            to="/optimistic"
+            className={navClass}
+          >
+            Optimistic Mode
+          </NavLink>
         </nav>
       </div>
     </header>

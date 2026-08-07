@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Home from "./pages/Home";
 import NormalCrud from "./pages/NormalCrud";
 import AdvancedCrud from "./pages/AdvancedCrud";
+import OptimisticCrud from "./pages/OptimisticCrud";
 
 function App() {
   return (
@@ -24,6 +25,11 @@ function App() {
             <Route
               path="/advanced"
               element={<AdvancedCrud />}
+            />
+
+             <Route
+              path="/optimistic"
+              element={<OptimisticCrud />}
             />
           </Routes>
         </div>

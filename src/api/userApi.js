@@ -59,6 +59,12 @@ export const updateUser = async ({
 
 
 export const deleteUser = async (id) => {
+
+    await new Promise((resolve) =>
+    setTimeout(resolve, 3000)
+  );
+
+  
   const response = await fetch(`${BASE_URL}/users/${id}`, {
     method: "DELETE",
   });
